@@ -1,6 +1,6 @@
 /*Copyright 2024 Jonas Caetano
 
-Licensed under the Apache License, Version 2.0 (the "License");
+Licensed under the Apache License, Version 2.0 (the "License")
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -13,128 +13,185 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 class Chat {
-    constructor(model, findwappFunction){
-      this.findwappFunction = findwappFunction;
-      this._inst = model;
-    }
+  /**
+   * creates a new instance of user chat
+   * @param {Object} model - the chat model
+   * @param {Function} findwappFunction - function to find WhatsApp modules
+   */
+  constructor(model, findwappFunction){
+    this.findwappFunction = findwappFunction
+    this._inst = model
+  }
 
-    async archive(){
-        return new Promise(async (resolve, reject) => {
-          const func = this.findwappFunction("Cmd")
-          await func[0].archiveChat(this._inst, true)
-          resolve(true)
-        })
-    };
-
-    async unarchive(){
+  /**
+   * archives the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully archived
+   */
+  async archive(){
       return new Promise(async (resolve, reject) => {
         const func = this.findwappFunction("Cmd")
-        await func[0].archiveChat(this._inst, false)
+        await func[0].archiveChat(this._inst, true)
         resolve(true)
       })
-  };
+  }
 
-    async open(message){
-        return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("openChat")
-        if (typeof func != "object"){
-
-          reject(false)
-        }       
-        const wId = this._inst["__x_id"]
-        await func[0](wId)
-
-        if (typeof message === "string" && message.length >= 1){
-
-          await new Promise((s, r) => { setTimeout(() => { s(true) }, 200) } )
-          const newTagElement = document.createElement("a")
-          const userPhone = this._inst.__x_contact.__x_id.user
-          newTagElement.setAttribute("class", "_11JPr selectable-text copyable-texts OpenChat")
-          newTagElement.setAttribute("href", `http://wa.me/${userPhone}?text=${message}`)
-          newTagElement.setAttribute("title",  `http://wa.me/${userPhone}` )
-          newTagElement.setAttribute("target", `_blank`)
-          document.body.append(newTagElement)
-          newTagElement.click()
-          newTagElement.remove()
-        } 
-        resolve(true)
-      })
-  };
-
-    async close(){
-        return new Promise(async (resolve, reject) => {
-            const func = this.findwappFunction("Cmd")
-            func[0].closeChat(this._inst)
-        resolve(true)
-        })
-    };
-
-    async pin(){
+  /**
+   * unarchives the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully unarchived
+   */
+  async unarchive(){
     return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("Cmd")
-        await func[0].pinChat(this._inst, true)
-        resolve(true)
+      const func = this.findwappFunction("Cmd")
+      await func[0].archiveChat(this._inst, false)
+      resolve(true)
     })
-    };
+}
 
-    async unpin(){
+  /**
+   * opens the chat and optionally type a message
+   * @param {string} message - the message to be typing (optional)
+   * @returns {Promise<boolean>} - Returns true if the chat is successfully opened
+   */
+  async open(message){
       return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("Cmd")
-        await func[0].pinChat(this._inst, false)
-        resolve(true)
-      })
-    };
+      const func = this.findwappFunction("openChat")
+      if (typeof func != "object"){
+        reject(false)
+      }       
+      const wId = this._inst["__x_id"]
+      await func[0](wId)
 
-    async mute(){
-      return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("Cmd")
-        await func[0].muteChat(this._inst, true, 0)
-        resolve(true)
-      })
-    };
+      if (typeof message === "string" && message.length >= 1){
+        await new Promise((s, r) => { setTimeout(() => { s(true) }, 200) } )
+        const newTagElement = document.createElement("a")
+        const userPhone = this._inst.__x_contact.__x_id.user
+        newTagElement.setAttribute("class", "_11JPr selectable-text copyable-texts OpenChat")
+        newTagElement.setAttribute("href", `http://wa.me/${userPhone}?text=${message}`)
+        newTagElement.setAttribute("title",  `http://wa.me/${userPhone}` )
+        newTagElement.setAttribute("target", `_blank`)
+        document.body.append(newTagElement)
+        newTagElement.click()
+        newTagElement.remove()
+      } 
+      resolve(true)
+    })
+}
 
-    async unmute(){
+  /**
+   * closes the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully closed
+   */
+  async close(){
       return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("Cmd")
-        await func[0].muteChat(this._inst, false)
-        resolve(true)
+          const func = this.findwappFunction("Cmd")
+          func[0].closeChat(this._inst)
+      resolve(true)
       })
-    };
+  }
 
-    async clear(){
-      return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("sendClear")
-        await func[0](this._inst, false)
-        resolve(true)
-      })
-    };
+  /**
+   * pins the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully pinned
+   */
+  async pin(){
+  return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("Cmd")
+      await func[0].pinChat(this._inst, true)
+      resolve(true)
+  })
+  }
 
-    async delete(){
-      return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("sendDelete")
-        await func[0](this._inst)
-        resolve(true)
-      })
-    };
+  /**
+   * unpins the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully unpinned
+   */
+  async unpin(){
+    return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("Cmd")
+      await func[0].pinChat(this._inst, false)
+      resolve(true)
+    })
+  }
 
-    async markAsRead(){
-      return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("Cmd")
-        await func[0].markChatUnread(this._inst, false)
-        resolve(true)
-      })
-    };
+  /**
+   * mutes the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully muted
+   */
+  async mute(){
+    return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("Cmd")
+      await func[0].muteChat(this._inst, true, 0)
+      resolve(true)
+    })
+  }
 
-    async markAsUnread(){
-      return new Promise(async (resolve, reject) => {
-        const func = this.findwappFunction("Cmd")
-        await func[0].markChatUnread(this._inst, true)
-        resolve(true)
-      })
-    };
+  /**
+   * unmutes the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully unmuted
+   */
+  async unmute(){
+    return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("Cmd")
+      await func[0].muteChat(this._inst, false, 0)
+      resolve(true)
+    })
+  }
+
+  /**
+   * clears the chat
+   * @returns {Promise<boolean>} - Returns true if the chat is successfully cleared
+   */
+  async clear(){
+    return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("sendClear")
+      await func[0](this._inst, false)
+      resolve(true)
+    })
+  }
+
+  /**
+   * deletes the chat
+   * @returns {Promise<boolean>} - returns true if the chat is successfully deleted
+   */
+  async delete(){
+    return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("sendDelete")
+      await func[0](this._inst)
+      resolve(true)
+    })
+  }
+
+  /**
+   * marks the chat as read
+   * @returns {Promise<boolean>} - returns true if the chat is successfully marked as read
+   */
+  async markAsRead(){
+    return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("Cmd")
+      await func[0].markChatUnread(this._inst, false)
+      resolve(true)
+    })
+  }
+
+  /**
+   * marks the chat as unread
+   * @returns {Promise<boolean>} - returns true if the chat is successfully marked as unread
+   */
+  async markAsUnread(){
+    return new Promise(async (resolve, reject) => {
+      const func = this.findwappFunction("Cmd")
+      await func[0].markChatUnread(this._inst, true)
+      resolve(true)
+    })
+  }
 }
 
 class User {
+  /**
+   * constructor for the User class
+   * @param {object} wid - the user identification object
+   * @param {function} findwappFunction - function to find WhatsApp modules
+   */
   constructor(wid, findwappFunction){
     this.findwappFunction = findwappFunction
     this._wid = wid
@@ -142,7 +199,7 @@ class User {
     chatCollections._models.forEach(chatModel => {
     if ( chatModel.__x_id === this._wid ){
         this.chat = new Chat(chatModel, this.findwappFunction)
-    }});
+    }})
 
     if ( typeof this.chat === "undefined" ){
       /*const func = this.findwappFunction("Chat")
@@ -160,6 +217,10 @@ class User {
     this.phone = this._wid.user
   }
 
+  /**
+   * returns the user profile picture
+   * @returns {Promise<object>} - promise resolved with the image details
+  */
   async pic(){
     return new Promise(async (resolve, reject) => {
       const func = this.findwappFunction("profilePicResync")
@@ -180,10 +241,14 @@ class User {
     })
   }
 
+  /**
+   * returns the user biography
+   * @returns {Promise<String>} - promise resolved with the user biography
+  */
   async biography(){
     return new Promise(async (resolve, reject) => {
       const func = this.findwappFunction("getStatus")
-      let status, data;
+      let status, data
       for ( let i = 1; i < 3 && typeof status === "undefined"; i++){
         switch (i) {
           case 1:
@@ -196,7 +261,7 @@ class User {
             data = await func[1](this._wid)
             status = data.status
           default:
-            break;
+            break
         }
       }
       //const status = typeof data === "string"? data : typeof data.status
@@ -207,6 +272,10 @@ class User {
     })
   }
 
+  /**
+   * blocks the user
+   * @returns {Promise<boolean>} - promise resolved with true if blocking is successful
+  */
   async block(){
     return new Promise(async (resolve, reject) => {
       const func = this.findwappFunction("blockUser")
@@ -218,6 +287,10 @@ class User {
     })
   }
 
+  /**
+   * unblocks the user
+   * @returns {Promise<boolean>} - promise resolved with true if unblocking is successful
+  */
   async unblock(){
     return new Promise(async (resolve, reject) => {
       const func = this.findwappFunction("unblockUser")
@@ -231,15 +304,22 @@ class User {
 }
 
 class WhatsAppTools {
-
+    /**
+     * constructor for the WhatsAppTools class
+     * initializes the instance with the current user identification
+     */
     constructor(){
       this.myWid = this.findwappFunction("getMaybeMeUser")[0]()
     }
-  
+
+   /**
+     * retrieves short details of the current user profile
+     * @returns {Promise<object>}  - promise resolved with the user profile details
+    */
     async myProfileShortDetails() {
         return new Promise(async (resolve, reject) => {
   
-          let wawcDbName = "wawc";
+          let wawcDbName = "wawc"
           let databases = await window.indexedDB.databases()
           let wawcDbVersion = databases.find(db => db.name === wawcDbName).version
           let wawcDb = window.indexedDB.open(wawcDbName, wawcDbVersion)
@@ -249,7 +329,7 @@ class WhatsAppTools {
               let objectStore = transaction.objectStore("user")
               let getAllRequest = objectStore.getAll()
               getAllRequest.onsuccess = function (event) {
-                  let data = event.target.result;
+                  let data = event.target.result
                   let profile_access_settings =  JSON.parse( data.find(data => data.value.indexOf("online") > -1 ).value )
                   resolve({
                       me_display_name: JSON.parse( data.find(data => data.key == "me-display-name").value),
@@ -267,31 +347,41 @@ class WhatsAppTools {
                           last_seen_vissible_for: profile_access_settings.lastSeen
   
                         }
-                    });
-                };
-            };
+                    })
+                }
+            }
   
             })
   
     }
-  
+
+   /**
+     * sets the theme for the WhatsApp web client
+     * @param {string} theme - the theme to be set (either 'dark' or 'light')
+     * @returns {Promise<boolean>} - promise resolved with true if theme setting is successful
+    */
     async setTheme(theme){
           return new Promise(async (resolve, reject) => {
             const func = this.findwappFunction("setTheme")
             if (theme === "dark" || theme === "light"){
               //document.body.setAttribute("class", "web dark")
               window.theme = theme
-              func[0](theme)
+              func[1](theme)
             } /*else if (theme === "light"){
   
               document.body.removeAttribute("class")
             }*/ else {
               reject(theme)
             }
-            resolve(true);
+            resolve(true)
           })
-    };
-  
+    }
+
+    /**
+     * retrieves a User object for the specified user ID
+     * @param {string} id - the ID of the user to retrieve
+     * @returns {Promise<User>} - promise resolved with the User object
+    */
     async GetUser(id){
           return new Promise(async (resolve, reject) => {
             const func = this.findwappFunction("createWid")
@@ -303,8 +393,12 @@ class WhatsAppTools {
           resolve(new User(wId, this.findwappFunction) )
   
           })
-    };
+    }
 
+    /**
+     * logs out the current user from the WhatsApp web client
+     * @returns {Promise<boolean>} - promise resolved with true if logout is successful
+    */
     async logout(){
       return new Promise(async (resolve, reject) => {
         const func = this.findwappFunction("socketLogout")
@@ -315,42 +409,62 @@ class WhatsAppTools {
       resolve(true)
 
       })
-};
-  
-    findwappFunction(name) {
-          var results = []
-          const webpackChunk = window.webpackChunkbuild || window.webpackChunkwhatsapp_web_client
-          const wappFunctions = {}
-          if (webpackChunk) {
-              webpackChunk.push([
-                  [Math.random().toString(36).substring(7)],
-                  {},
-                  function (require) {
-                      for (const wappFunction in require.m) {
-
-                        if (Object.prototype.hasOwnProperty.call(require.m, wappFunction)) {
-                              wappFunctions[wappFunction] = require(wappFunction)
-                          }
-                      }
-                  }
-              ]);
-          }
-          for (const func in wappFunctions) {
-              if (wappFunctions.hasOwnProperty(func)) {
-                  const wappFunction = wappFunctions[func]
-                /*
-              if (name === "ChatModels" && typeof wappFunction !== "undefined" && wappFunction.default && typeof wappFunction.default.Chat !== "undefined") {
-                    return wappFunction.default.Chat
-                  }
-                */
-                  if (typeof wappFunction === "object" && wappFunction[name]) {
-                      results.push(wappFunction[name])
-                  }
-              }
-          }
-          return results
-      }
-      
 }
 
-window.WTools = new WhatsAppTools();
+    /**
+     * finds and retrieves WhatsApp functions by name
+     * @param {string} name - the name of the WhatsApp function to find
+     * @returns {Array} - array of functions found with the specified name
+     */
+      findwappFunction(name) {
+      var results = []
+      const wappFunctions = {}
+
+      let modObj = {}
+      if (parseFloat(window.Debug.VERSION) < 2.3) {
+          (window.webpackChunkbuild || window.webpackChunkwhatsapp_web_client).push([["parasiteijn34h82hdf"], {},
+          function (findMod) {
+              Object.keys(findMod.m).forEach(function (mod) { modObj[mod] = findMod(mod) })
+          }])
+      } else {
+          let modules = self.require("__debug").modulesMap
+          Object.keys(modules).filter(e => e.includes("WA")).forEach(function (mod) {
+              let mdls = modules[mod]
+              if (mdls) {
+                  modObj[mod] = {
+                      default: mdls.defaultExport,
+                      factory: mdls.factory,
+                      ...mdls
+                  }
+                  if (Object.keys(modObj[mod].default).length == 0) {
+                      try {
+                          self.ErrorGuard.skipGuardGlobal(true)
+                          Object.assign(modObj[mod], self.importNamespace(mod))
+                      } catch (e) {
+                      }
+                  }
+              }
+          })
+      }
+
+      for (const mod in modObj) {
+          if (modObj.hasOwnProperty(mod)) {
+              const module = modObj[mod]
+              wappFunctions[mod] = module
+          }
+      }
+
+      for (const func in wappFunctions) {
+          if (wappFunctions.hasOwnProperty(func)) {
+              const wappFunction = wappFunctions[func]
+              if (typeof wappFunction === "object" && wappFunction[name]) {
+                  results.push(wappFunction[name])
+              }
+          }
+      }
+      return results
+      }
+
+  }
+
+var WTools = new WhatsAppTools()
